@@ -30,6 +30,6 @@ class VehicleRegistration(models.Model):
     expiration_date = models.DateField()
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-
+    
     def __str__(self):
         return f'{self.owner} - {self.vehicle}'

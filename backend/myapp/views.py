@@ -1,24 +1,39 @@
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
 from .models import Owner, Vehicle, VehicleRegistration
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from myapp import serializers
 
-def LoginView(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-    else:
-        return render(request, 'registration/login.html')
 
-@login_required
-def home(request):
-    return render(request, 'myapp/home.html', {'username': request.user.username})
+from rest_framework import generics
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+    authentication_classes = (TokenAuthentication,)
+
+class CreateUserView(generics.CreateAPIView):
+    model = User
+    serializer_class = serializers.UserSerializer
+
+    def post(self, request, format='json'):
+        serializer = serializers.UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                token = Token.objects.create(user=user)
+                json = serializer.data
+                json['token'] = token.key
+                return Response(json, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class OwnerListView(ListView):
     model = Owner
 
@@ -35,7 +50,6 @@ class OwnerUpdateView(UpdateView):
 
 class OwnerDeleteView(DeleteView):
     model = Owner
-    success_url = reverse_lazy('owner_list')
 
 class VehicleListView(ListView):
     model = Vehicle
@@ -53,7 +67,7 @@ class VehicleUpdateView(UpdateView):
 
 class VehicleDeleteView(DeleteView):
     model = Vehicle
-    success_url = reverse_lazy('vehicle_list')
+    
 
 class VehicleRegistrationListView(ListView):
     model = VehicleRegistration
@@ -71,4 +85,4 @@ class VehicleRegistrationUpdateView(UpdateView):
 
 class VehicleRegistrationDeleteView(DeleteView):
     model = VehicleRegistration
-    success_url = reverse_lazy('registration_list')
+    

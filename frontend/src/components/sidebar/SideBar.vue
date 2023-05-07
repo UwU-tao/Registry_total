@@ -1,4 +1,5 @@
 <script>
+import axios from 'axios'
 import SidebarLink from './SidebarLink'
 import { collapsed, toggleSidebar, sidebarWidth } from './state'
 
@@ -7,18 +8,57 @@ export default {
   components: { SidebarLink },
   setup() {
     return { collapsed, toggleSidebar, sidebarWidth }
+  },
+  data(){
+    return {
+      user: {},
+    }
+  },
+  mounted() {
+    // this.getUser()
+  },
+  methods: {
+    async logout() {
+      await axios
+          .post('/api/v1/token/logout/')
+          .then(response => {
+              console.log(response.data)
+          })
+          .catch(error => {
+              console.log(JSON.stringify(error))
+          })
+      
+      axios.defaults.headers.common['Authorization'] = ''
+
+      localStorage.removeItem('token')
+
+      this.$store.commit('removeToken')
+
+      this.$router.push('/')
+    },
+    // async getUser() {
+    //   const userID = this.$store.state.user.div
+    //   await axios
+    //     .get(`/api/v1/users/${userID}/`)
+    //     .then(response => {
+    //       this.user = response.data
+
+    //       axios
+    //         .get(`/api/users/${userID}/`)
+    //     })
+    // }
   }
 }
 </script>
 
 <template>
   <div class="sidebar" :style="{ width: sidebarWidth }">
-    <h1>
+    <h1 style="text-align: center;">
       <span v-if="collapsed">
-        <div>V</div>
-        <div>S</div>
+        <div>R</div>
+        <div>T</div>
       </span>
-      <span v-else>Vue Sidebar</span>
+      <span v-else>Registry Total</span>
     </h1>
 
     <SidebarLink to="/" icon="fas fa-home">Home</SidebarLink>
@@ -26,7 +66,7 @@ export default {
     <SidebarLink to="/analytics" icon="fas fa-chart-bar">Analytics</SidebarLink>
     <SidebarLink to="/friends" icon="fas fa-users">Friends</SidebarLink>
     <SidebarLink to="/image" icon="fas fa-image">Images</SidebarLink>
-
+    <SidebarLink to="" icon="fas fa-sign-out" @click="logout">Logout</SidebarLink>
     <span
       class="collapse-icon"
       :class="{ 'rotate-180': collapsed }"

@@ -1,39 +1,33 @@
-<script>
-import Sidebar from '@/components/sidebar/SideBar'
-import { sidebarWidth } from '@/components/sidebar/state'
-export default {
-  components: { Sidebar },
-  setup() {
-    return { sidebarWidth }
-  }
-}
-</script>
 <template>
-  <Sidebar />
-  <div :style="{ 'margin-left': sidebarWidth }">
-    <router-view />
-  </div>
+  <nav>
+    <component :is="navComponent"></component>
+  </nav>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+  import PreAuth from '@/components/PreAuth'
+  import PostAuth from '@/components/PostAuth'
+  import axios from 'axios'
 
-#nav {
-  padding: 30px;
-}
+  export default {
+    name: 'App',
+    components: {
+      PreAuth,
+      PostAuth
+    },
+    computed: {
+      navComponent() {
+        return this.$store.state.token ? PostAuth : PreAuth
+      }
+    },
+    beforeCreate() {
+      this.$store.commit('initializeStore')
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+      if (this.$store.state.token) {
+          axios.defaults.headers.common['Authorization'] = "Token " + this.$store.state.token
+      } else {
+          axios.defaults.headers.common['Authorization'] = ""
+      }
+    }
+  }
+</script>
