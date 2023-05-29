@@ -1,14 +1,22 @@
 <template>
-  <h1>The sidebar is {{ collapsed ? 'closed' : 'open' }}</h1>
-  <button @click="toggleSidebar">Toggle Sidebar</button>
+  <div>
+    <h1>Dashboard</h1>
+    <p>Toggle sidebar: <button @click="toggleSidebar">Toggle</button></p>
+    <p>Collapsed: {{ collapsed }}</p>
+    <DataTable />
+  </div>
 </template>
 
 <script>
 import { collapsed, toggleSidebar } from '@/components/sidebar/state'
+import DataTable from '@/components/DataTable.vue'
 
 export default {
   setup() {
-    return { collapsed, toggleSidebar }
+    return { collapsed, toggleSidebar}
+  },
+  components: {
+    DataTable
   }
 }
 </script>
