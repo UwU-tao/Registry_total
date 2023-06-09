@@ -17,8 +17,9 @@ const routes = [
   },
   {
     path: '/register',
-    name: 'Signup',
-    component: SignupView
+    name: 'Create Account',
+    component: SignupView,
+    meta: {requireLogin: true}
   },
   {
     path: '/dashboard',

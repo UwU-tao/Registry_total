@@ -27,12 +27,14 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-    'http://localhost:8081',
-    'http://127.0.0.1:8080'
+    "http://localhost:8080",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8080",
+]
+# CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,7 +47,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'djoser'
+    'djoser',
+    # 'myapp',
+    'import_export',
 ]
 
 MIDDLEWARE = [

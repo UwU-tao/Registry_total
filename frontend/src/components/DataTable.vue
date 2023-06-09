@@ -4,28 +4,25 @@
             <tr>
                 <th><input type="checkbox" v-model="selectAll" @change="toggleSelectAll"></th>
                 <th @click="sortBy('id')" :class="{ active: currentSortColumn === 'id', asc: currentSortDirection === 'asc', desc: currentSortDirection === 'desc'}">ID<span v-if="currentSortColumn === 'id'">{{ currentSortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-                <th @click="sortBy('name')" :class="{ active: currentSortColumn === 'name', asc: currentSortDirection === 'asc', desc: currentSortDirection === 'desc'}">Name<span v-if="currentSortColumn === 'name'">{{ currentSortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Zipcode</th>
-                <th>Phone</th>
-                <th>Website</th>
-                <th>Company</th>
+                <!-- <th @click="sortBy('name')" :class="{ active: currentSortColumn === 'name', asc: currentSortDirection === 'asc', desc: currentSortDirection === 'desc'}">Name<span v-if="currentSortColumn === 'name'">{{ currentSortDirection === 'asc' ? '▲' : '▼' }}</span></th> -->
+                <th>License Plate</th>
+                <th>Brand</th>
+                <th>Registration Date</th>
+                <th>Expiration Date</th>
+                <th>Registration Center</th>
                 <th>Details</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="item in tableData" :key="item.id">
+            <tr v-for="item in tableData" :key="item.inc">
               <td><input type="checkbox" v-model="item.selected"></td>
-              <td>{{ item.id }}</td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.email }}</td>
-              <td>{{ item.username }}</td>
-              <td>{{ item.address.zipcode }}</td>
-              <td>{{ item.phone }}</td>
-              <td>{{ item.website }}</td>
-              <td>{{ item.company.name }}</td>
+              <td>{{ item.inc }}</td>
+              <td>{{ item.Vehicle.plate }}</td>
+              <td>{{ item.Vehicle.brand }}</td>
+              <td>{{ item.Regis.regis_date }}</td>
+              <td>{{ item.Regis.expiration_date }}</td>
+              <td>{{ item.Regis.regis_center }}</td>
               <td><button @click="showModal(item)" class="detail">Show Details</button></td>
               <td>
                 <button @click="editItem(item)">Edit</button>
@@ -37,20 +34,25 @@
     <div v-if="currentItem" class="modal" @click="closeModal">
       <div class="modal-content" @click.stop>
         <span @click="closeModal" class="close">&times;</span>
-        <h2>{{ currentItem.name }}</h2>
-        <p><b>Address:</b> {{ currentItem.address.street }}, {{ currentItem.address.suite }}, {{ currentItem.address.city }}</p>
-        <p><b>Company:</b> {{ currentItem.company.name }}</p>
-        <p><b>Company catchphrase:</b> {{ currentItem.company.catchPhrase }}</p>
-        <p><b>Company bs:</b> {{ currentItem.company.bs }}</p>
+        <h2>{{ currentItem.inc }}</h2>
+        <p><b>Name:</b> {{ currentItem.Owner.last_name }} {{ currentItem.Owner.first_name }}</p>
+        <p><b>Address:</b> {{ currentItem.Owner.address }}</p>
+        <p><b>Email:</b> {{ currentItem.Owner.email }}</p>
+        <p><b>Phone:</b> {{ currentItem.Owner.phone }}</p>
         <button @click="exportToPDF">Export to PDF</button>
       </div>
     </div>
-     <button @click="exportToCSV">Export to CSV</button>
+
+    <form>
+      <input type="file" @change="handleFileUpload" ref="fileInput" enctype="multipart/form-data">
+      <button @click="uploadFile">Upload</button>
+    </form>
+    <button @click="exportToCSV">Export to CSV</button>
 </template>
   
 <script>
   import axios from 'axios'
-  import jsPDF from 'jspdf'
+  // import jsPDF from 'jspdf'
   
   export default {
     data() {
@@ -61,6 +63,7 @@
         dialog: false,
         currentItem: null,
         selectAll: false,
+        file: null,
       }
     },
     methods: {
@@ -88,10 +91,10 @@
       exportToCSV() {
         const selectedRows = this.tableData.filter(row => row.selected);
         let csvContent = "data:text/csv;charset=utf-8,";
-        let headers = ["ID", "Name", "Email", "Username"];
+        let headers = ["ID", "License Plate", "Brand", "Registration Date", "Expiration Date", "Registration Center"];
         csvContent += headers.map(header => `"${header}"`).join(",") + "\r\n";
         selectedRows.forEach(function(row) {
-          let rowData = [row.id, row.name, row.email, row.username];
+          let rowData = [row.id, row.license_plate, row.regis_date, row.expiration_date, row.regis_center];
           let rowString = rowData.map(value => `"${value}"`).join(",");
           csvContent += rowString + "\r\n";
         });
@@ -104,26 +107,46 @@
       },
       exportToPDF() {
         // Create a new jsPDF instance
-        const doc = new jsPDF()
+        // const doc = new jsPDF()
         
         // Add the item details to the PDF
-        doc.text(`Name: ${this.currentItem.name}`, 10, 10)
-        doc.text(`Address: ${this.currentItem.address.street}, ${this.currentItem.address.suite}, ${this.currentItem.address.city}`, 10, 20)
-        doc.text(`Company: ${this.currentItem.company.name}`, 10, 30)
-        doc.text(`Company catchphrase: ${this.currentItem.company.catchPhrase}`, 10, 40)
-        doc.text(`Company bs: ${this.currentItem.company.bs}`, 10, 50)
+        // doc.text(`Name: ${this.currentItem.name}`, 10, 10)
+        // doc.text(`Address: ${this.currentItem.address.street}, ${this.currentItem.address.suite}, ${this.currentItem.address.city}`, 10, 20)
+        // doc.text(`Company: ${this.currentItem.company.name}`, 10, 30)
+        // doc.text(`Company catchphrase: ${this.currentItem.company.catchPhrase}`, 10, 40)
+        // doc.text(`Company bs: ${this.currentItem.company.bs}`, 10, 50)
         
-        // Save the PDF
-        doc.save('item_details.pdf')
+        // // Save the PDF
+        // doc.save('item_details.pdf')
       },
       toggleSelectAll() {
         this.tableData.forEach(item => item.selected = this.selectAll)
       },
+      handleFileUpload(event) {
+        event.preventDefault();
+        this.file = event.target.files[0];
+      },
+      async uploadFile() {
+        const formData = new FormData();
+        formData.append('excel_file', this.file);
+
+        await axios
+          .post('/api/import/', formData)
+          .then(response => {
+            console.log(response.data);
+            // Handle success message or redirect
+          })
+          .catch(error => {
+            console.error(error);
+            // Handle error
+          });
+      },
     },
     mounted() {
-      axios.get('http://localhost:8080/data.json')
+      axios.get('/api/vehicles/')
         .then(response => {
-          this.tableData = response.data.map(item => ({ ...item, selected: false }));
+          // this.tableData = response.data.map(item => ({ ...item, selected: false }));
+          this.tableData = response.data;
           console.log(response.data);
         })
         .catch(error => {

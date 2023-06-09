@@ -69,7 +69,7 @@
 
                         localStorage.setItem('userid', response.data.id)
 
-                        this.$router.push('/about')
+                        this.$router.push('/dashboard')
                     })
                     .catch(error => {
                         console.log(error)

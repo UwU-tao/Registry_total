@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Owner, Vehicle, VehicleRegistration
 from django.contrib.auth.models import User
+from myapp.models import Vehicle, VehicleRegistration
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,3 +18,25 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class VehicleSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Vehicle
+        fields = ['plate', 'regis_date', 'province', 'type', 'brand', 'model_code', 'man_year', 'man_country', 'engine_no', 'chassis_no', 'color', 'sit', 'load', 'modification', 'lifetime_limit', 'regis_code']
+
+
+        
+class VehicleRegisSerializer(serializers.ModelSerializer):
+    vehicle = VehicleSerializer(read_only=True)
+    
+    class Meta:
+        model = VehicleRegistration
+        fields = ['codee', 'regis_date', 'expiration_date', 'regis_center', 'vehicle']
+        
+class OwnerSerializer(serializers.ModelSerializer):
+    regis = VehicleRegisSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Owner
+        fields = ['idd', 'first_name', 'last_name', 'email', 'phone', 'address', 'dob', 'regis']

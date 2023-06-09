@@ -36,17 +36,16 @@ export default {
 
       this.$router.push('/')
     },
-    // async getUser() {
-    //   const userID = this.$store.state.user.div
-    //   await axios
-    //     .get(`/api/v1/users/${userID}/`)
-    //     .then(response => {
-    //       this.user = response.data
-
-    //       axios
-    //         .get(`/api/users/${userID}/`)
-    //     })
-    // }
+    checkSuperuser() {
+      axios.get('/api/check-superuser/')
+        .then(response => {
+          // this.isSuperuser = response.data.is_superuser;
+          return response.is_superuser;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
   }
 }
 </script>
@@ -64,8 +63,7 @@ export default {
     <SidebarLink to="/" icon="fas fa-home">Home</SidebarLink>
     <SidebarLink to="/dashboard" icon="fas fa-columns">Dashboard</SidebarLink>
     <SidebarLink to="/analytics" icon="fas fa-chart-bar">Analytics</SidebarLink>
-    <SidebarLink to="/friends" icon="fas fa-users">Friends</SidebarLink>
-    <SidebarLink to="/image" icon="fas fa-image">Images</SidebarLink>
+    <SidebarLink to="/register" icon="fas fa-registered" v-if="checkSuperuser">Create Account</SidebarLink>
     <SidebarLink to="" icon="fas fa-sign-out" @click="logout">Logout</SidebarLink>
     <span
       class="collapse-icon"
