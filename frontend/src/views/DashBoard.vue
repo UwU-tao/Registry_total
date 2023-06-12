@@ -1,8 +1,6 @@
 <template>
   <div>
     <h1>Dashboard</h1>
-    <p>Toggle sidebar: <button @click="toggleSidebar">Toggle</button></p>
-    <p>Collapsed: {{ collapsed }}</p>
     <DataTable />
   </div>
 </template>
