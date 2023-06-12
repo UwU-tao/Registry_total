@@ -111,6 +111,7 @@
       <p><b>Weight:</b> <i>Sit:</i> {{ currentItem.Vehicle.sit }} <i>Load:</i> {{ currentItem.Vehicle.load }}</p>
       <p><b>Modification:</b> {{ currentItem.Vehicle.modification != null ? "Yes" : "No" }} </p>
       <p><b>Lifetime Limit:</b> {{ currentItem.Vehicle.lifetime_limit }}</p>
+      <p><b>Purpose:</b> {{ currentItem.Vehicle.purpose }}</p>
       <p><b>3. Vehicle Registration</b></p>
       <p><b>Registration Code:</b> {{ currentItem.Regis.codee }}</p>
       <p><b>Registration Date:</b> {{ currentItem.Regis.regis_date }}</p>
@@ -266,18 +267,19 @@
         doc.text(`Mã khung xe: ${this.currentItem.Vehicle.chassis_no}`, doc.getStringUnitWidth(`Mã động cơ: ${this.currentItem.Vehicle.engine_no}`) + 50, 140);
         doc.text(`Màu xe: ${this.currentItem.Vehicle.color}`, 10, 150);
         doc.text(`Trọng tải: Số ghế ngồi: ${this.currentItem.Vehicle.sit}, Khối lượng chuyên chở: ${this.currentItem.Vehicle.load != null ? this.currentItem.Vehicle.load : ''}`, doc.getStringUnitWidth(`Màu xe: ${this.currentItem.Vehicle.color}`) + 50, 150);
+        doc.text(`Mục đích sử dụng: ${this.currentItem.Vehicle.purpose}`, 10, 160);
 
         doc.setFont('Times New Roman', 'bolditalic');
         doc.setFontSize(14);
-        doc.text('3. Thông tin đăng kiểm', 10, 160);
+        doc.text('3. Thông tin đăng kiểm', 10, 170);
 
         doc.setFont('Times New Roman', 'normal');
         doc.setFontSize(12);
-        doc.text(`Mã đăng kiểm: ${this.currentItem.Regis.codee}`, 10, 170);
-        doc.text(`Ngày đăng kiểm: ${this.currentItem.Regis.regis_date}`, 10, 180);
-        doc.text(`Ngày hết hạn: ${this.currentItem.Regis.expiration_date}`, 10, 190);
-        doc.text(`Trung tâm đăng kiểm: ${this.currentItem.Regis.regis_center}`, 10, 200);
-        doc.text(`Tỉnh đăng kiểm: ${this.cityNames[this.currentItem.Regis.regis_center.substring(0, 2)]}`, doc.getStringUnitWidth(`Trung tâm đăng kiểm: ${this.currentItem.Regis.regis_center}`) + 100, 200);
+        doc.text(`Mã đăng kiểm: ${this.currentItem.Regis.codee}`, 10, 180);
+        doc.text(`Ngày đăng kiểm: ${this.currentItem.Regis.regis_date}`, 10, 190);
+        doc.text(`Ngày hết hạn: ${this.currentItem.Regis.expiration_date}`, 10, 200);
+        doc.text(`Trung tâm đăng kiểm: ${this.currentItem.Regis.regis_center}`, 10, 210);
+        doc.text(`Tỉnh đăng kiểm: ${this.cityNames[this.currentItem.Regis.regis_center.substring(0, 2)]}`, doc.getStringUnitWidth(`Trung tâm đăng kiểm: ${this.currentItem.Regis.regis_center}`) + 100, 210);
 
         doc.save('item_details.pdf');
       },

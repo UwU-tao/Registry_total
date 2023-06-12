@@ -109,7 +109,7 @@ def import_data(request):
             val3.save()
             
             val2 = Vehicle(
-                data[7], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], data[23]
+                data[7], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15], data[16], data[17], data[18], data[19], data[20], data[21], data[23], data[22]
             )
             val2.save()
             

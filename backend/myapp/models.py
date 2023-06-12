@@ -42,7 +42,8 @@ class Vehicle(models.Model):
     sit = models.CharField(max_length=10)
     load = models.CharField(max_length=10, blank=True, null=True)
     modification = models.CharField(max_length=50, blank=True, null=True)
-    lifetime_limit = models.CharField(max_length=20, null=True, blank=True)    
+    lifetime_limit = models.CharField(max_length=20, null=True, blank=True)
+    purpose = models.CharField(max_length=100, null=True, blank=True)    
     regis_code = models.ForeignKey(VehicleRegistration, on_delete=models.CASCADE)
 
     def __str__(self):
