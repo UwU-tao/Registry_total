@@ -47,7 +47,7 @@
                 <th>Expiration Date</th>
                 <th>Registration Center</th>
                 <th>Details</th>
-                <th>Actions</th>
+                <!-- <th>Actions</th> -->
             </tr>
         </thead>
         <tbody>
@@ -60,10 +60,10 @@
               <td>{{ item.Regis.expiration_date }}</td>
               <td>{{ item.Regis.regis_center }}</td>
               <td><button @click="showModal(item)" class="detail">Show Details</button></td>
-              <td>
+              <!-- <td>
                 <button @click="editItem(item)">Edit</button>
                 <button @click="deleteItem(item)">Delete</button>
-              </td>
+              </td> -->
             </tr>
         </tbody>
     </table>

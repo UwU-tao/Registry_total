@@ -67,6 +67,7 @@ class CreateUserView(generics.CreateAPIView):
 #     return JsonResponse(combined_data, safe=False)
 
 @api_view(['GET'])
+@permission_classes((permissions.IsAdminUser,))
 def view_data(request):
     owner = Owner.objects.all()
     regis = VehicleRegistration.objects.filter(owner__in=owner)
@@ -91,6 +92,7 @@ def view_data(request):
     return JsonResponse(combined_data, safe=False)
     
 @csrf_exempt
+@permission_classes((permissions.IsAdminUser,))
 def import_data(request):
     if request.method=='POST':
         dataset = tablib.Dataset()
