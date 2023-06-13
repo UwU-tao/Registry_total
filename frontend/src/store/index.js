@@ -42,5 +42,10 @@ export default createStore({
   actions: {
   },
   modules: {
-  }
+  },
+  getters: {
+    getUsername: function (state) {
+      return state.user.username;
+    },
+  },
 })

@@ -10,6 +10,7 @@ urlpatterns = [
     path('users/new/', views.CreateUserView, name="create_account"),
     path('vehicles/', views.view_data, name="vehicle_list"),
     path('import/', views.import_data, name='import_data'),
+    path('vehicles/<str:id>/', views.get_data, name="vehicle_detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -2,6 +2,7 @@
 import axios from 'axios'
 import SidebarLink from './SidebarLink'
 import { collapsed, toggleSidebar, sidebarWidth } from './state'
+import index from '../../store/index'
 
 export default {
   props: {},
@@ -16,6 +17,11 @@ export default {
   },
   mounted() {
     // this.getUser()
+  },
+  computed: {
+    username: function() {
+        return index.getters.getUsername;
+      },
   },
   methods: {
     async logout() {
@@ -65,6 +71,7 @@ export default {
     <SidebarLink to="/analytics" icon="fas fa-chart-bar">Analytics</SidebarLink>
     <SidebarLink to="/register" icon="fas fa-registered" v-if="checkSuperuser">Create Account</SidebarLink>
     <SidebarLink to="" icon="fas fa-sign-out" @click="logout">Logout</SidebarLink>
+    <span class="user">{{username}}</span>
     <span
       class="collapse-icon"
       :class="{ 'rotate-180': collapsed }"
@@ -119,5 +126,14 @@ export default {
 .rotate-180 {
   transform: rotate(180deg);
   transition: 0.2s linear;
+}
+
+.user {
+  position: absolute;
+  bottom: 2.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: 1.2em;
 }
 </style>
