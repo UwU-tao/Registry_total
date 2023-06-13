@@ -47,14 +47,19 @@ export default {
   },
   methods: {
     async logout() {
-      try {
-        await axios.post('/api/v1/token/logout/')
-        localStorage.removeItem('token')
-        this.$store.commit('removeToken')
-        this.$router.push('/')
-      } catch (error) {
-        console.log(error.response)
-      }
+    await axios
+      .post('/api/v1/token/logout/')
+      .then(response => {
+        console.log(response.data)
+      })
+      .catch(error => {
+          console.log(JSON.stringify(error))
+      })
+        
+      axios.defaults.headers.common['Authorization'] = ''
+      this.$store.commit('removeToken')
+
+      this.$router.push('/')
     },
     async checkSuperuser() {
       try {
