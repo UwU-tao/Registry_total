@@ -21,6 +21,7 @@ class VehicleRegistration(models.Model):
     expiration_date = models.CharField(max_length=50)
     regis_center = models.CharField(max_length=50)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    my_plate = models.CharField(max_length=50, blank=True, null=True)
     # vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     
     def __str__(self):

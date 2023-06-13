@@ -32,7 +32,7 @@ class VehicleRegisSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = VehicleRegistration
-        fields = ['codee', 'regis_date', 'expiration_date', 'regis_center', 'vehicle']
+        fields = ['codee', 'regis_date', 'expiration_date', 'regis_center', 'vehicle', 'my_plate']
         
 class OwnerSerializer(serializers.ModelSerializer):
     regis = VehicleRegisSerializer(many=True, read_only=True)
