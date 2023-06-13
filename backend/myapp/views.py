@@ -143,7 +143,7 @@ def record(request, plate):
         regis_center = data.get('regis_center')
 
         try:
-            # vehicle = Vehicle.objects.get(license_plate=plate)
+            # vehicle = Vehicle.objects.get(plate=plate)
             vehicle_registration = VehicleRegistration.objects.get(my_plate=plate)
             vehicle_registration.regis_date = regis_date
             vehicle_registration.expiration_date = exp_date
