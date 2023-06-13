@@ -45,7 +45,7 @@
                 <th>Brand</th>
                 <th>Registration Date</th>
                 <th>Expiration Date</th>
-                <th>Registration Center</th>
+                <th v-if="superUser">Registration Center</th>
                 <th>Details</th>
                 <!-- <th>Actions</th> -->
             </tr>
@@ -58,7 +58,7 @@
               <td>{{ item.Vehicle.brand }}</td>
               <td>{{ item.Regis.regis_date }}</td>
               <td>{{ item.Regis.expiration_date }}</td>
-              <td>{{ item.Regis.regis_center }}</td>
+              <td v-if="superUser">{{ item.Regis.regis_center }}</td>
               <td><button @click="showModal(item)" class="detail">Show Details</button></td>
               <!-- <td>
                 <button @click="editItem(item)">Edit</button>
@@ -141,6 +141,9 @@
   import { bold_font } from "../assets/timesbd-bold.js";
   import { italic_font } from "../assets/timesi-italic.js";
   import { bi_font } from "../assets/timesbi-bolditalic.js";
+
+  const token = localStorage.getItem('token');
+
   import index from '../store/index.js'
   
   export default {
@@ -159,13 +162,27 @@
         totalPages: 1,
         searchFields: [{column: '', datePart: '', query:''}],
         cityNames: {
-        '29': 'Hà Nội',
-        '50': 'TP. Hồ Chí Minh',
+          '29': 'Hà Nội',
+          '50': 'TP. Hồ Chí Minh',
         },
+        superUser: false,
       }
     },
 
     methods: {
+      async checkSuperuser() {
+        axios.get('/api/check_superuser/', {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+        .then(response => {
+          this.superUser = response.data.is_superuser;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      },
       fetchData() {
         let link = '';
         if (this.username === 'admin') {link = '/api/vehicles/';}

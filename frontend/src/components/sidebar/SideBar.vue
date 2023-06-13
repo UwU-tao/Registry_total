@@ -1,61 +1,3 @@
-<script>
-import axios from 'axios'
-import SidebarLink from './SidebarLink'
-import { collapsed, toggleSidebar, sidebarWidth } from './state'
-import index from '../../store/index'
-
-export default {
-  props: {},
-  components: { SidebarLink },
-  setup() {
-    return { collapsed, toggleSidebar, sidebarWidth }
-  },
-  data(){
-    return {
-      user: {},
-    }
-  },
-  mounted() {
-    // this.getUser()
-  },
-  computed: {
-    username: function() {
-        return index.getters.getUsername;
-      },
-  },
-  methods: {
-    async logout() {
-      await axios
-          .post('/api/v1/token/logout/')
-          .then(response => {
-              console.log(response.data)
-          })
-          .catch(error => {
-              console.log(JSON.stringify(error))
-          })
-      
-      axios.defaults.headers.common['Authorization'] = ''
-
-      localStorage.removeItem('token')
-
-      this.$store.commit('removeToken')
-
-      this.$router.push('/')
-    },
-    checkSuperuser() {
-      axios.get('/api/check-superuser/')
-        .then(response => {
-          // this.isSuperuser = response.data.is_superuser;
-          return response.is_superuser;
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    },
-  }
-}
-</script>
-
 <template>
   <div class="sidebar" :style="{ width: sidebarWidth }">
     <h1 style="text-align: center;">
@@ -69,7 +11,7 @@ export default {
     <SidebarLink to="/" icon="fas fa-home">Home</SidebarLink>
     <SidebarLink to="/dashboard" icon="fas fa-columns">Dashboard</SidebarLink>
     <SidebarLink to="/analytics" icon="fas fa-chart-bar">Analytics</SidebarLink>
-    <SidebarLink to="/register" icon="fas fa-registered" v-if="checkSuperuser">Create Account</SidebarLink>
+    <SidebarLink to="/register" icon="fas fa-registered" v-if="isSuperuser">Create Account</SidebarLink>
     <SidebarLink to="" icon="fas fa-sign-out" @click="logout">Logout</SidebarLink>
     <span class="user">{{username}}</span>
     <span
@@ -81,6 +23,63 @@ export default {
     </span>
   </div>
 </template>
+
+<script>
+import axios from 'axios'
+import SidebarLink from './SidebarLink'
+import { collapsed, toggleSidebar, sidebarWidth } from './state'
+import index from '../../store/index'
+
+export default {
+  components: { SidebarLink },
+  setup() {
+    return { collapsed, toggleSidebar, sidebarWidth }
+  },
+  data() {
+    return {
+      isSuperuser: false,
+    }
+  },
+  computed: {
+    username: function() {
+        return index.getters.getUsername;
+      },
+  },
+  methods: {
+    async logout() {
+      try {
+        await axios.post('/api/v1/token/logout/')
+        localStorage.removeItem('token')
+        this.$store.commit('removeToken')
+        this.$router.push('/')
+      } catch (error) {
+        console.log(error.response)
+      }
+    },
+    async checkSuperuser() {
+      try {
+        const response = await axios.get('/api/check_superuser/')
+        this.isSuperuser = response.data.is_superuser
+      } catch (error) {
+        console.log(error.response)
+      }
+    },
+  },
+  async mounted() {
+    try {
+      const token = localStorage.getItem('token')
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Token ${token}`
+        await this.checkSuperuser()
+      } else {
+        this.$router.push('/') // Redirect to login if token is not available
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+}
+</script>
 
 <style>
 :root {
