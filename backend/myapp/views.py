@@ -15,6 +15,7 @@ from django.core import serializers
 import json
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
@@ -25,7 +26,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     authentication_classes = (TokenAuthentication,)
 
-@user_passes_test(lambda user: user.is_superuser)
+@permission_classes((permissions.IsAdminUser,))
 class CreateUserView(generics.CreateAPIView):
     model = User
     serializer_class = UserSerializer
@@ -41,40 +42,18 @@ class CreateUserView(generics.CreateAPIView):
                 return Response(json, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# @api_view(['GET'])
-# def view_data(request):
-#     owner = Owner.objects.all()
-#     regis = owner.vehicleregistration.all()
-#     vehicle = regis.vehicle.all()
-    
-#     combined_data = []
 
-#     for i, (owner_instance, vehicle_instance, vehicleregistration_instance) in enumerate(zip(owner, vehicle, regis)):
-#         owner_serialized_data = json.loads(serializers.serialize('json', [owner_instance]))[0]['fields']
-#         vehicle_serialized_data = json.loads(serializers.serialize('json', [vehicle_instance]))[0]['fields']
-#         vehicleregistration_serialized_data = json.loads(serializers.serialize('json', [vehicleregistration_instance]))[0]['fields']
-
-#         combined_instance = {
-#             'inc': i + 1,  # Auto-increment ID
-#             'Owner': owner_serialized_data,
-#             'Vehicle': vehicle_serialized_data,
-#             'VehicleRegis': vehicleregistration_serialized_data 
-#         }
-
-#         combined_data.append(combined_instance)
-
-#     return JsonResponse(combined_data, safe=False)
 
 @api_view(['GET'])
-@permission_classes((permissions.IsAdminUser,))
+@csrf_exempt
+# @permission_classes((permissions.IsAdminUser,))
 def view_data(request):
     owner = Owner.objects.all()
     regis = VehicleRegistration.objects.filter(owner__in=owner)
     vehicles = Vehicle.objects.filter(regis_code__in=regis)
     
     combined_data = []
-
+    
     for i, (owner_instance, vehicleregistration_instance, vehicle_instance) in enumerate(zip(owner, regis, vehicles)):
         owner_serialized_data = json.loads(serializers.serialize('json', [owner_instance]))[0]['fields']
         vehicleregistration_serialized_data = json.loads(serializers.serialize('json', [vehicleregistration_instance]))[0]['fields']
@@ -86,9 +65,8 @@ def view_data(request):
             'Regis': vehicleregistration_serialized_data,
             'Vehicle': vehicle_serialized_data
         }
-
         combined_data.append(combined_instance)
-
+            
     return JsonResponse(combined_data, safe=False)
     
 @csrf_exempt
@@ -119,3 +97,9 @@ def import_data(request):
         return JsonResponse({'message': 'Import successful'})
 
     return JsonResponse({'error': 'Invalid request'})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_superuser(request):
+    is_superuser = request.user.is_superuser
+    return Response({'is_superuser': is_superuser})
