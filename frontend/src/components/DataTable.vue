@@ -42,25 +42,20 @@
       <div class="modall-content">
         <span class="close" @click="close">&times;</span>
         <h1>Add Record</h1>
-        <form @submit="submitForm">
+        <form @submit="addRecord">
           <div class="formm-group">
             <label for="license_plate">License Plate:</label>
-          <input type="text" id="license_plate" v-model="license_plate" required>
-          </div>
-          
-          <div class="formm-group">
-            <label for="code">Code:</label>
-          <input type="text" id="code" v-model="code" required>
+          <input type="text" name="license_plate" id="license_plate" v-model="license_plate" required>
           </div>
           
           <div class="formm-group">
             <label for="regis_date">Registration Date:</label>
-            <input type="text" id="regis_date" v-model="regis_date" required>
+            <input type="text" name="regis_date" id="regis_date" v-model="regis_date" required>
           </div>
           
           <div class="formm-group">
             <label for="exp_date">Expiration Date:</label>
-            <input type="text" id="exp_date" v-model="exp_date" required>
+            <input type="text" name="exp_date" id="exp_date" v-model="exp_date" required>
           </div>
           <button type="submit">Submit</button>
         </form>
@@ -197,7 +192,7 @@
           '50': 'TP. Hồ Chí Minh',
         },
         show: false,
-        license_plate:'', code:'', regis_date:'', exp_date:'', regis_center:''
+        license_plate:'', regis_date:'', exp_date:'', regis_center:''
       }
     },
 
@@ -210,15 +205,13 @@
     },
       addRecord() {
         let link = '';
-        if (this.username !== 'admin') {link = '/api/record/'}
+        if (this.username !== 'admin') {link = `/api/record/${this.license_plate}/`}
         const record = {
-          license_plate: this.license_plate,
-          code: this.code,
           regis_date: this.regis_date,
           exp_date: this.exp_date,
           regis_center: this.username
         }
-        axios.post(link, record)
+        axios.put(link, record)
         .then(response => {
           console.log(response.data)
         })
