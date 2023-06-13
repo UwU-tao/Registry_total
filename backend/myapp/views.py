@@ -132,6 +132,19 @@ def get_data(request, id):
 
     return JsonResponse(combined_data, safe=False)
 
+@csrf_exempt
+def record(request):
+    license_plate = request.POST.get('license_plate')
+    code = request.POST.get('code')
+    regis_date = request.POST.get('regis_date')
+    exp_date = request.POST.get('exp_date')
+    regis_center = request.POST.get('regis_center')
 
-
+    regis = VehicleRegistration.objects.get(license_plate=license_plate)
+    if regis.exists():
+        regis.code = code
+        regis.regis_date = regis_date
+        regis.exp_date = exp_date
+        regis.regis_center = regis_center
+        regis.save()
     

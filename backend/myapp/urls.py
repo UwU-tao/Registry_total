@@ -12,6 +12,7 @@ urlpatterns = [
     path('import/', views.import_data, name='import_data'),
     path('check_superuser/', views.check_superuser, name='check_superuser'),
     path('vehicles/<str:id>/', views.get_data, name="vehicle_detail"),
+    path('record/', views.record, name='record'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
