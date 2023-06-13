@@ -47,7 +47,6 @@
                 <th>Expiration Date</th>
                 <th>Registration Center</th>
                 <th>Details</th>
-                <!-- <th>Actions</th> -->
             </tr>
         </thead>
         <tbody>
@@ -60,14 +59,11 @@
               <td>{{ item.Regis.expiration_date }}</td>
               <td>{{ item.Regis.regis_center }}</td>
               <td><button @click="showModal(item)" class="detail">Show Details</button></td>
-              <!-- <td>
-                <button @click="editItem(item)">Edit</button>
-                <button @click="deleteItem(item)">Delete</button>
-              </td> -->
             </tr>
         </tbody>
         <tfoot>
           <tr>
+            <td></td>
             <td>Total cars: {{ totalCars }}</td>
           </tr>
         </tfoot>
@@ -131,7 +127,9 @@
     <input type="file" @change="handleFileUpload" ref="fileInput" enctype="multipart/form-data">
     <button @click="uploadFile">Upload</button>
   </form>
-  <button @click="exportToCSV">Export to CSV</button>
+  <div>
+    <button @click="exportToCSV">Export to CSV</button>
+    </div>
 </template>
   
 <script>
@@ -141,8 +139,6 @@
   import { bold_font } from "../assets/timesbd-bold.js";
   import { italic_font } from "../assets/timesi-italic.js";
   import { bi_font } from "../assets/timesbi-bolditalic.js";
-
-
   import index from '../store/index.js'
   
   export default {
