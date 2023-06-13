@@ -66,6 +66,11 @@
               </td> -->
             </tr>
         </tbody>
+        <tfoot>
+          <tr>
+            <td>Total cars: {{ totalCars }}</td>
+          </tr>
+        </tfoot>
     </table>
   </div>
 
@@ -122,7 +127,7 @@
     </div>
   </div>
 
-  <form>
+  <form v-if="username === 'admin'">
     <input type="file" @change="handleFileUpload" ref="fileInput" enctype="multipart/form-data">
     <button @click="uploadFile">Upload</button>
   </form>
@@ -139,6 +144,8 @@
 
   const token = localStorage.getItem('token');
 
+  import index from '../store/index.js'
+  
   export default {
     data() {
       return {
@@ -177,7 +184,10 @@
         });
       },
       fetchData() {
-        axios.get('/api/vehicles/')
+        let link = '';
+        if (this.username === 'admin') {link = '/api/vehicles/';}
+        else {link = `/api/vehicles/${this.username}/`}
+        axios.get(link)
         .then(response => {
           // this.tableData = response.data.map(item => ({ ...item, selected: false }));
           this.tableData = response.data;
@@ -480,6 +490,14 @@
           }
         } 
         return filteredData;
+      },
+
+      totalCars() {
+        return this.filteredTableData.length;
+      },
+
+      username: function() {
+        return index.getters.getUsername;
       },
     },
   }

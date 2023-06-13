@@ -16,21 +16,25 @@ import json
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 class UserList(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     authentication_classes = (TokenAuthentication,)
 
 @permission_classes((permissions.IsAdminUser,))
 class CreateUserView(generics.CreateAPIView):
+    permission_classes = [IsAdminUser]
     model = User
     serializer_class = UserSerializer
-
+    
     def post(self, request, format='json'):
         serializer = serializers.UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -103,3 +107,31 @@ def import_data(request):
 def check_superuser(request):
     is_superuser = request.user.is_superuser
     return Response({'is_superuser': is_superuser})
+def get_data(request, id):
+    owner = Owner.objects.all()
+    regis = VehicleRegistration.objects.filter(owner__in=owner)
+    vehicles = Vehicle.objects.filter(regis_code__in=regis)
+    count = 0
+    
+    combined_data = []
+    for i, (owner_instance, vehicleregistration_instance, vehicle_instance) in enumerate(zip(owner, regis, vehicles)):
+        if vehicleregistration_instance.regis_center == id:
+            owner_serialized_data = json.loads(serializers.serialize('json', [owner_instance]))[0]['fields']
+            vehicleregistration_serialized_data = json.loads(serializers.serialize('json', [vehicleregistration_instance]))[0]['fields']
+            vehicle_serialized_data = json.loads(serializers.serialize('json', [vehicle_instance]))[0]['fields']
+            count += 1
+
+            combined_instance = {
+                'inc': count,  # Auto-increment ID
+                'Owner': owner_serialized_data,
+                'Regis': vehicleregistration_serialized_data,
+                'Vehicle': vehicle_serialized_data
+            }
+
+            combined_data.append(combined_instance)
+
+    return JsonResponse(combined_data, safe=False)
+
+
+
+    
