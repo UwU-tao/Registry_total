@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 import tablib
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 import json
 from rest_framework import permissions
@@ -107,6 +107,8 @@ def import_data(request):
 def check_superuser(request):
     is_superuser = request.user.is_superuser
     return Response({'is_superuser': is_superuser})
+
+
 def get_data(request, id):
     owner = Owner.objects.all()
     regis = VehicleRegistration.objects.filter(owner__in=owner)
@@ -133,18 +135,26 @@ def get_data(request, id):
     return JsonResponse(combined_data, safe=False)
 
 @csrf_exempt
-def record(request):
-    license_plate = request.POST.get('license_plate')
-    code = request.POST.get('code')
-    regis_date = request.POST.get('regis_date')
-    exp_date = request.POST.get('exp_date')
-    regis_center = request.POST.get('regis_center')
+def record(request, plate):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        regis_date = data.get('regis_date')
+        exp_date = data.get('exp_date')
+        regis_center = data.get('regis_center')
 
-    regis = VehicleRegistration.objects.get(license_plate=license_plate)
-    if regis.exists():
-        regis.code = code
-        regis.regis_date = regis_date
-        regis.exp_date = exp_date
-        regis.regis_center = regis_center
-        regis.save()
-    
+        try:
+            # vehicle = Vehicle.objects.get(license_plate=plate)
+            vehicle_registration = VehicleRegistration.objects.get(my_plate=plate)
+            vehicle_registration.regis_date = regis_date
+            vehicle_registration.expiration_date = exp_date
+            vehicle_registration.regis_center = regis_center
+            vehicle_registration.save()
+            return HttpResponse('Record updated successfully.')
+        except Vehicle.DoesNotExist:
+            return HttpResponse('Vehicle not found.')
+        except VehicleRegistration.DoesNotExist:
+            return HttpResponse('Vehicle registration not found.')
+        except Exception as e:
+            return HttpResponse('Error occurred while updating the record: ' + str(e))
+
+    return JsonResponse({'success': True})
