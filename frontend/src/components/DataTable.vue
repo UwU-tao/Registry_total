@@ -36,6 +36,38 @@
   </div>
 
   <div>
+    <!-- <button @click="addRecord">Add record</button> -->
+    <button @click="open" style="text-align: center;" v-if="username!=='admin'">Add record</button>
+    <div class="modall" :class="{ 'show': show }">
+      <div class="modall-content">
+        <span class="close" @click="close">&times;</span>
+        <h1>Add Record</h1>
+        <form @submit="submitForm">
+          <div class="formm-group">
+            <label for="license_plate">License Plate:</label>
+          <input type="text" id="license_plate" v-model="license_plate" required>
+          </div>
+          
+          <div class="formm-group">
+            <label for="code">Code:</label>
+          <input type="text" id="code" v-model="code" required>
+          </div>
+          
+          <div class="formm-group">
+            <label for="regis_date">Registration Date:</label>
+            <input type="text" id="regis_date" v-model="regis_date" required>
+          </div>
+          
+          <div class="formm-group">
+            <label for="exp_date">Expiration Date:</label>
+            <input type="text" id="exp_date" v-model="exp_date" required>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+
+
     <table class="table">
         <thead>
             <tr>
@@ -47,6 +79,7 @@
                 <th>Expiration Date</th>
                 <th>Registration Center</th>
                 <th>Details</th>
+                <!-- <th>Actions</th> -->
             </tr>
         </thead>
         <tbody>
@@ -59,11 +92,14 @@
               <td>{{ item.Regis.expiration_date }}</td>
               <td>{{ item.Regis.regis_center }}</td>
               <td><button @click="showModal(item)" class="detail">Show Details</button></td>
+              <!-- <td>
+                <button @click="editItem(item)">Edit</button>
+                <button @click="deleteItem(item)">Delete</button>
+              </td> -->
             </tr>
         </tbody>
         <tfoot>
           <tr>
-            <td></td>
             <td>Total cars: {{ totalCars }}</td>
           </tr>
         </tfoot>
@@ -127,9 +163,7 @@
     <input type="file" @change="handleFileUpload" ref="fileInput" enctype="multipart/form-data">
     <button @click="uploadFile">Upload</button>
   </form>
-  <div>
-    <button @click="exportToCSV">Export to CSV</button>
-    </div>
+  <button @click="exportToCSV">Export to CSV</button>
 </template>
   
 <script>
@@ -139,6 +173,8 @@
   import { bold_font } from "../assets/timesbd-bold.js";
   import { italic_font } from "../assets/timesi-italic.js";
   import { bi_font } from "../assets/timesbi-bolditalic.js";
+
+
   import index from '../store/index.js'
   
   export default {
@@ -160,10 +196,36 @@
           '29': 'Hà Nội',
           '50': 'TP. Hồ Chí Minh',
         },
+        show: false,
+        license_plate:'', code:'', regis_date:'', exp_date:'', regis_center:''
       }
     },
 
     methods: {
+      open() {
+      this.show = true
+    },
+    close() {
+      this.show = false
+    },
+      addRecord() {
+        let link = '';
+        if (this.username !== 'admin') {link = '/api/record/'}
+        const record = {
+          license_plate: this.license_plate,
+          code: this.code,
+          regis_date: this.regis_date,
+          exp_date: this.exp_date,
+          regis_center: this.username
+        }
+        axios.post(link, record)
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          console.log(error.data)
+        })
+      },
       fetchData() {
         let link = '';
         if (this.username === 'admin') {link = '/api/vehicles/';}
@@ -485,6 +547,7 @@
 </script>
 
 <style>
+
 .table {
     width: 100%;
     margin-bottom: 1rem;
@@ -564,5 +627,52 @@ th.active {
 .timeRemaining {
   margin-right: 10px;
   border: 1px solid #ccc;
+}
+
+/* Modal */
+.modall {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modall.show {
+  display: block;
+}
+
+/* Modal Content */
+.modall-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 400px;
+  max-width: 90%;
+}
+
+/* Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Form */
+.formm-group {
+  margin-bottom: 20px;
 }
 </style>
